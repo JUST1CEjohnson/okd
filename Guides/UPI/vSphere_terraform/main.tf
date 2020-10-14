@@ -27,7 +27,7 @@ module "resource_pool" {
 module "bootstrap" {
   source = "./machine"
 
-  name                 = "bootstrap"
+  name                 = "yktdkbn"
   instance_count       = var.bootstrap_complete ? 0 : 1
   ignition             = var.bootstrap_ignition
   resource_pool_id     = module.resource_pool.pool_id
@@ -37,17 +37,17 @@ module "bootstrap" {
   datacenter_id        = data.vsphere_datacenter.dc.id
   template             = var.vm_template
   cluster_domain       = var.cluster_domain
-  mac_addresses        = compact(list(var.bootstrap_mac))
-  memory               = "8192"
+  ip_addresses         = ["${compact(list(var.bootstrap_ip))}"]
+  machine_cidr         = "${var.machine_cidr}"
+  memory               = "16834"
   num_cpu              = "4"
-  num_cores_per_socket = "4"
-  disk_size            = "60"
+  disk_size            = "120"
 }
 
 module "master" {
   source = "./machine"
 
-  name                 = "master"
+  name                 = "yktdkmn"
   instance_count       = var.control_plane_count
   ignition             = var.control_plane_ignition
   resource_pool_id     = module.resource_pool.pool_id
@@ -57,17 +57,17 @@ module "master" {
   datacenter_id        = data.vsphere_datacenter.dc.id
   template             = var.vm_template
   cluster_domain       = var.cluster_domain
-  mac_addresses        = var.control_plane_macs
-  memory               = "16384"
+  ip_addresses         = ["${compact(list(var.bootstrap_ip))}"]
+  machine_cidr         = "${var.machine_cidr}"
+  memory               = "16834"
   num_cpu              = "4"
-  num_cores_per_socket = "4"
-  disk_size            = "60"
+  disk_size            = "120"
 }
 
 module "compute" {
   source = "./machine"
 
-  name                 = "worker"
+  name                 = "yktdkwn"
   instance_count       = var.compute_count
   ignition             = var.compute_ignition
   resource_pool_id     = module.resource_pool.pool_id
@@ -77,9 +77,9 @@ module "compute" {
   datacenter_id        = data.vsphere_datacenter.dc.id
   template             = var.vm_template
   cluster_domain       = var.cluster_domain
-  mac_addresses        = var.compute_macs
-  memory               = "8192"
+  ip_addresses         = ["${compact(list(var.bootstrap_ip))}"]
+  machine_cidr         = "${var.machine_cidr}"
+  memory               = "16834"
   num_cpu              = "4"
-  num_cores_per_socket = "4"
-  disk_size            = "60"
+  disk_size            = "120"
 }
